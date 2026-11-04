@@ -17,7 +17,7 @@ function Header() {
               </NavLink>
             </li>
             <li><NavLink to="/personalizar">Personalizar</NavLink></li>
-            <li><NavLink to="/pedidos">Mis pedidos</NavLink></li>
+            <li><NavLink to="/pedidos">Pedidos</NavLink></li>
             <li><NavLink to="/contacto">Contacto</NavLink></li>
             <li><NavLink to="/clientes">Clientes</NavLink></li>
           </ul>

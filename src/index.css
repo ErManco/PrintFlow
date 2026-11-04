@@ -611,3 +611,59 @@ footer {
   color: white;
   box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
 }
+/* --- TABLA ADMINISTRATIVA (PEDIDOS) --- */
+.table-container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow-x: auto; /* Scroll en móviles */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.admin-table th {
+  background-color: #f9fafb;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.total-col {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Colores de estados (por si no los tienes exactos) */
+.status-pendiente { background: #fee2e2; color: #991b1b; }
+.status-en-proceso { background: #fef3c7; color: #92400e; }
+.status-enviado { background: #dbeafe; color: #1e40af; }
+.status-entregado { background: #d1fae5; color: #065f46; }
