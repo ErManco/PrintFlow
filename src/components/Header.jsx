@@ -19,6 +19,7 @@ function Header() {
             <li><NavLink to="/personalizar">Personalizar</NavLink></li>
             <li><NavLink to="/pedidos">Mis pedidos</NavLink></li>
             <li><NavLink to="/contacto">Contacto</NavLink></li>
+            <li><NavLink to="/clientes">Clientes</NavLink></li>
           </ul>
         </nav>
       </div>
