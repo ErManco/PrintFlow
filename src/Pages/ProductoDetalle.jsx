@@ -1,14 +1,27 @@
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { productos } from "../data/productos";
+import { useProductos } from "../context/ProductosContext";
+import { useCarrito } from "../context/CarritoContext";
 
 function ProductoDetalle() {
-  const { id } = useParams(); // Obtenemos el ID de la URL
-  const navigate = useNavigate(); // Para el botón de "Volver"
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { productos } = useProductos();
+  const { agregarAlCarrito } = useCarrito();
 
-  // Buscamos el producto en nuestros datos
-  const producto = productos.find((p) => p.id === parseInt(id));
+  const [tallaSeleccionada, setTallaSeleccionada] = useState("M");
+  const [colorSeleccionado, setColorSeleccionado] = useState(null);
 
-  // Si no existe el producto, mostramos un aviso
+  const producto = productos.find((p) => String(p.id) === String(id));
+
+  // Efecto para inicializar el primer color disponible
+  useEffect(() => {
+    if (producto?.colores) {
+      const primerColor = Object.keys(producto.colores)[0];
+      if (primerColor) setColorSeleccionado(primerColor);
+    }
+  }, [producto]);
+
   if (!producto) {
     return (
       <main className="empty-state">
@@ -20,54 +33,78 @@ function ProductoDetalle() {
     );
   }
 
+  // Determinamos qué imagen mostrar: Si hay un color seleccionado, usamos su imagen.
+  // Si no, usamos la imagen general del producto.
+  const imagenAMostrar = colorSeleccionado && producto.colores 
+    ? producto.colores[colorSeleccionado] 
+    : producto.imagen;
+
+  const esImagenReal = imagenAMostrar?.startsWith("data:image") || imagenAMostrar?.startsWith("http");
+
   return (
     <main className="product-detail-container">
-      {/* Botón para regresar */}
       <button className="btn-back" onClick={() => navigate(-1)}>
-        ← Volver
+        ← Volver al catálogo
       </button>
 
       <div className="product-detail-layout">
-        {/* Lado Izquierdo: Imagen */}
+        {/* IMAGEN DINÁMICA */}
         <div className="product-detail-image">
-          <div className={`shirt-mockup ${producto.imagen}`}></div>
+          {esImagenReal ? (
+            <img src={imagenAMostrar} alt={producto.titulo} className="real-shirt-img" />
+          ) : (
+            <div className={`shirt-mockup ${imagenAMostrar}`}></div>
+          )}
         </div>
 
-        {/* Lado Derecho: Información */}
         <div className="product-detail-info">
           <span className="badge-collection">{producto.categoria}</span>
           <h1>{producto.titulo}</h1>
-          
-          {/* Precio simulado */}
-          <p className="product-price">$299.00 MXN</p>
-          
+          <p className="product-price">${producto.precio || "299"}.00 MXN</p>
           <p className="product-detail-desc">{producto.descripcion}</p>
 
           <hr className="divider" />
 
-          {/* Tallas */}
           <div className="selector-group">
             <h3>Tallas disponibles</h3>
             <div className="options-container">
-              <button className="option-btn">S</button>
-              <button className="option-btn active">M</button>
-              <button className="option-btn">L</button>
-              <button className="option-btn">XL</button>
+              {["S", "M", "L", "XL"].map((talla) => (
+                <button 
+                  key={talla}
+                  className={`option-btn ${tallaSeleccionada === talla ? "active" : ""}`}
+                  onClick={() => setTallaSeleccionada(talla)}
+                >
+                  {talla}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Colores */}
-          <div className="selector-group">
-            <h3>Colores disponibles</h3>
-            <div className="options-container">
-              <button className="color-btn" style={{ backgroundColor: '#f8f5f0' }}></button>
-              <button className="color-btn active" style={{ backgroundColor: '#1f2937' }}></button>
-              <button className="color-btn" style={{ backgroundColor: '#e5e7eb' }}></button>
+          {/* SELECTOR DE COLORES DINÁMICO */}
+          {producto.colores && Object.keys(producto.colores).length > 0 && (
+            <div className="selector-group">
+              <h3>Colores disponibles</h3>
+              <div className="options-container">
+                {Object.keys(producto.colores).map((hex) => (
+                  <button 
+                    key={hex}
+                    className={`color-btn ${colorSeleccionado === hex ? "active" : ""}`} 
+                    style={{ backgroundColor: hex }}
+                    onClick={() => setColorSeleccionado(hex)}
+                    title={hex}
+                  ></button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Botón de acción principal */}
-          <button className="btn-primary btn-large" onClick={() => alert('¡Agregado al carrito!')}>
+          <button 
+            className="btn-primary btn-large" 
+            onClick={() => {
+              agregarAlCarrito(producto, tallaSeleccionada, colorSeleccionado);
+              alert(`Agregado: Talla ${tallaSeleccionada} ${colorSeleccionado ? `, Color ${colorSeleccionado}` : ''}`);
+            }}
+          >
             Agregar al carrito
           </button>
         </div>

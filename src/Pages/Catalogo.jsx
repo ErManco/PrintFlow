@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { productos as productosData } from "../data/productos";
 import ProductCard from "../components/ProductCard";
-import EmptyState from "../components/EmptyState";
+import { useProductos } from "../context/ProductosContext";
 
 function Catalogo() {
-  const [productos, setProductos] = useState(productosData);
+  const { productos } = useProductos();
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("Todas");
 
   // 1. Extraemos las categorías únicas de nuestros productos
-  // Usamos Set para evitar duplicados (ej. que "Naturaleza" no salga 2 veces)
   const categorias = ["Todas", ...new Set(productos.map((p) => p.categoria))];
 
   // 2. Filtramos los productos según la categoría seleccionada
@@ -16,11 +14,6 @@ function Catalogo() {
     categoriaSeleccionada === "Todas"
       ? productos
       : productos.filter((p) => p.categoria === categoriaSeleccionada);
-
-  // ⚠️ Botón de prueba temporal (puedes borrarlo después)
-  const toggleEstadoVacio = () => {
-    setProductos((prev) => (prev.length > 0 ? [] : productosData));
-  };
 
   return (
     <main>
@@ -64,7 +57,6 @@ function Catalogo() {
         </div>
       ) : (
         // CA4: Mensaje si no hay productos en esa categoría
-        // Reutilizamos tu componente EmptyState pero le pasamos un título personalizado
         <div className="empty-state">
           <div className="empty-icon-container">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -75,10 +67,6 @@ function Catalogo() {
           <p className="empty-text">No encontramos diseños en esta categoría por el momento.</p>
         </div>
       )}
-
-      <button className="toggle-dev" onClick={toggleEstadoVacio}>
-        Probar Estado Vacío (Catálogo general)
-      </button>
     </main>
   );
 }
