@@ -26,3 +26,8 @@ dist-ssr
 # Variables de entorno
 .env
 backend/.env
+
+
+# Respaldos de MySQL Workbench
+*.mwb.bak
+*.beforefix

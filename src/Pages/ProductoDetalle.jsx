@@ -1,74 +1,269 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { productos } from "../data/productos";
+import {
+  useState,
+  useEffect,
+} from "react";
+
+import {
+  useParams,
+  useNavigate,
+} from "react-router-dom";
+
+import { useProductos } from "../context/ProductosContext";
+import { useCarrito } from "../context/CarritoContext";
+import { useAuth } from "../context/AuthContext";
 
 function ProductoDetalle() {
-  const { id } = useParams(); // Obtenemos el ID de la URL
-  const navigate = useNavigate(); // Para el botón de "Volver"
+  const { id } = useParams();
 
-  // Buscamos el producto en nuestros datos
-  const producto = productos.find((p) => p.id === parseInt(id));
+  const navigate = useNavigate();
 
-  // Si no existe el producto, mostramos un aviso
+  const {
+    productos,
+    cargando,
+  } = useProductos();
+
+  const {
+    agregarAlCarrito,
+  } = useCarrito();
+
+  const { user } = useAuth();
+
+  const [
+    tallaSeleccionada,
+    setTallaSeleccionada,
+  ] = useState("M");
+
+  const [
+    colorSeleccionado,
+    setColorSeleccionado,
+  ] = useState(null);
+
+  const producto = productos.find(
+    (p) =>
+      String(p.id) === String(id)
+  );
+
+  useEffect(() => {
+    if (
+      producto?.colores &&
+      Object.keys(
+        producto.colores
+      ).length > 0
+    ) {
+      const primerColor =
+        Object.keys(
+          producto.colores
+        )[0];
+
+      setColorSeleccionado(
+        primerColor
+      );
+    } else {
+      setColorSeleccionado(null);
+    }
+  }, [producto]);
+
+  if (cargando) {
+    return (
+      <main className="empty-state">
+        <h3 className="empty-title">
+          Cargando producto...
+        </h3>
+      </main>
+    );
+  }
+
   if (!producto) {
     return (
       <main className="empty-state">
-        <h3 className="empty-title">Producto no encontrado</h3>
-        <button className="btn-primary" style={{ marginTop: '1rem' }} onClick={() => navigate('/catalogo')}>
+        <h3 className="empty-title">
+          Producto no encontrado
+        </h3>
+
+        <button
+          className="btn-primary"
+          style={{
+            marginTop: "1rem",
+          }}
+          onClick={() =>
+            navigate("/catalogo")
+          }
+        >
           Volver al catálogo
         </button>
       </main>
     );
   }
 
+  const imagenAMostrar =
+    colorSeleccionado &&
+    producto.colores
+      ? producto.colores[
+          colorSeleccionado
+        ]
+      : producto.imagen;
+
+  const imagen =
+    imagenAMostrar || "";
+
+  const esImagenReal =
+    imagen.startsWith("data:image") ||
+    imagen.startsWith("http") ||
+    imagen.includes(".");
+
+  const precio = Number(
+    producto.precio || 299
+  ).toFixed(2);
+
+  const handleAgregarCarrito = () => {
+    if (!user) {
+      alert(
+        "Debes iniciar sesión para agregar productos al carrito."
+      );
+
+      navigate("/login");
+
+      return;
+    }
+
+    agregarAlCarrito(
+      producto,
+      tallaSeleccionada,
+      colorSeleccionado
+    );
+
+    alert(
+      `Agregado al carrito: Talla ${tallaSeleccionada}${
+        colorSeleccionado
+          ? `, Color ${colorSeleccionado}`
+          : ""
+      }`
+    );
+  };
+
   return (
     <main className="product-detail-container">
-      {/* Botón para regresar */}
-      <button className="btn-back" onClick={() => navigate(-1)}>
-        ← Volver
+      <button
+        className="btn-back"
+        onClick={() =>
+          navigate("/catalogo")
+        }
+      >
+        ← Volver al catálogo
       </button>
 
       <div className="product-detail-layout">
-        {/* Lado Izquierdo: Imagen */}
         <div className="product-detail-image">
-          <div className={`shirt-mockup ${producto.imagen}`}></div>
+          {esImagenReal ? (
+            <img
+              src={imagen}
+              alt={producto.titulo}
+              className="real-shirt-img"
+            />
+          ) : (
+            <div
+              className={`shirt-mockup ${imagen}`}
+            ></div>
+          )}
         </div>
 
-        {/* Lado Derecho: Información */}
         <div className="product-detail-info">
-          <span className="badge-collection">{producto.categoria}</span>
-          <h1>{producto.titulo}</h1>
-          
-          {/* Precio simulado */}
-          <p className="product-price">$299.00 MXN</p>
-          
-          <p className="product-detail-desc">{producto.descripcion}</p>
+          <span className="badge-collection">
+            {producto.categoria}
+          </span>
+
+          <h1>
+            {producto.titulo}
+          </h1>
+
+          <p className="product-price">
+            ${precio} MXN
+          </p>
+
+          <p className="product-detail-desc">
+            {producto.descripcion}
+          </p>
 
           <hr className="divider" />
 
-          {/* Tallas */}
           <div className="selector-group">
-            <h3>Tallas disponibles</h3>
+            <h3>
+              Tallas disponibles
+            </h3>
+
             <div className="options-container">
-              <button className="option-btn">S</button>
-              <button className="option-btn active">M</button>
-              <button className="option-btn">L</button>
-              <button className="option-btn">XL</button>
+              {[
+                "S",
+                "M",
+                "L",
+                "XL",
+              ].map((talla) => (
+                <button
+                  key={talla}
+                  className={`option-btn ${
+                    tallaSeleccionada ===
+                    talla
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setTallaSeleccionada(
+                      talla
+                    )
+                  }
+                >
+                  {talla}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Colores */}
-          <div className="selector-group">
-            <h3>Colores disponibles</h3>
-            <div className="options-container">
-              <button className="color-btn" style={{ backgroundColor: '#f8f5f0' }}></button>
-              <button className="color-btn active" style={{ backgroundColor: '#1f2937' }}></button>
-              <button className="color-btn" style={{ backgroundColor: '#e5e7eb' }}></button>
-            </div>
-          </div>
+          {producto.colores &&
+            Object.keys(
+              producto.colores
+            ).length > 0 && (
+              <div className="selector-group">
+                <h3>
+                  Colores disponibles
+                </h3>
 
-          {/* Botón de acción principal */}
-          <button className="btn-primary btn-large" onClick={() => alert('¡Agregado al carrito!')}>
-            Agregar al carrito
+                <div className="options-container">
+                  {Object.keys(
+                    producto.colores
+                  ).map((hex) => (
+                    <button
+                      key={hex}
+                      className={`color-btn ${
+                        colorSeleccionado ===
+                        hex
+                          ? "active"
+                          : ""
+                      }`}
+                      style={{
+                        backgroundColor:
+                          hex,
+                      }}
+                      onClick={() =>
+                        setColorSeleccionado(
+                          hex
+                        )
+                      }
+                      title={hex}
+                    ></button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          <button
+            className="btn-primary btn-large"
+            onClick={
+              handleAgregarCarrito
+            }
+          >
+            {user
+              ? "Agregar al carrito"
+              : "Inicia sesión para comprar"}
           </button>
         </div>
       </div>

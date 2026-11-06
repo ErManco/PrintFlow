@@ -1,102 +1,168 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
 import ProductCard from "../components/ProductCard";
 
+import {
+  useProductos,
+} from "../context/ProductosContext";
+
+import {
+  useCategorias,
+} from "../context/CategoriasContext";
+
 function Catalogo() {
-  const [productos, setProductos] = useState([]);
-  const [categoriaSeleccionada, setCategoriaSeleccionada] =
-    useState("Todas");
+  const {
+    productos,
+    cargando,
+  } = useProductos();
 
-  // Cargar productos desde MySQL mediante el backend
-  useEffect(() => {
-    fetch("http://localhost:3000/api/productos")
-      .then((respuesta) => {
-        if (!respuesta.ok) {
-          throw new Error("No se pudieron obtener los productos");
-        }
+  const {
+    categorias,
+    cargandoCategorias,
+  } = useCategorias();
 
-        return respuesta.json();
-      })
-      .then((datos) => {
-        setProductos(datos);
-      })
-      .catch((error) => {
-        console.error("Error al cargar productos:", error);
-      });
-  }, []);
+  const [
+    categoriaSeleccionada,
+    setCategoriaSeleccionada,
+  ] = useState("Todas");
 
-  // 1. Extraemos las categorías únicas de los productos
-  const categorias = [
-    "Todas",
-    ...new Set(productos.map((p) => p.categoria)),
-  ];
-
-  // 2. Filtramos los productos según la categoría seleccionada
   const productosFiltrados =
-    categoriaSeleccionada === "Todas"
+    categoriaSeleccionada ===
+    "Todas"
       ? productos
       : productos.filter(
-          (p) => p.categoria === categoriaSeleccionada
+          (producto) =>
+            producto.categoria ===
+            categoriaSeleccionada
         );
+
+  if (
+    cargando ||
+    cargandoCategorias
+  ) {
+    return (
+      <main>
+        <div className="empty-state">
+          <h3 className="empty-title">
+            Cargando catálogo...
+          </h3>
+
+          <p className="empty-text">
+            Estamos preparando los
+            productos disponibles.
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main>
-      {/* Encabezado */}
-      <div className="catalog-header">
-        <span className="badge-collection">COLECCIÓN 2026</span>
+      {/* ENCABEZADO */}
 
-        <h1>Catálogo de playeras</h1>
+      <div className="catalog-header">
+        <span className="badge-collection">
+          COLECCIÓN 2026
+        </span>
+
+        <h1>
+          Catálogo de playeras
+        </h1>
 
         <p>
-          Explora nuestras playeras y descubre los diseños disponibles.
+          Explora nuestras playeras y
+          descubre los diseños
+          disponibles.
         </p>
       </div>
 
-      {/* Menú de Categorías - CA1 */}
+      {/* CATEGORÍAS */}
+
       <div className="category-menu">
-        {categorias.map((cat) => (
-          <button
-            key={cat}
-            className={`category-btn ${
-              categoriaSeleccionada === cat ? "active" : ""
-            }`}
-            onClick={() => setCategoriaSeleccionada(cat)}
-          >
-            {cat}
-          </button>
-        ))}
+        <button
+          className={`category-btn ${
+            categoriaSeleccionada ===
+            "Todas"
+              ? "active"
+              : ""
+          }`}
+          onClick={() =>
+            setCategoriaSeleccionada(
+              "Todas"
+            )
+          }
+        >
+          Todas
+        </button>
+
+        {categorias.map(
+          (categoria) => (
+            <button
+              key={
+                categoria.id_categoria
+              }
+              className={`category-btn ${
+                categoriaSeleccionada ===
+                categoria.nombre
+                  ? "active"
+                  : ""
+              }`}
+              onClick={() =>
+                setCategoriaSeleccionada(
+                  categoria.nombre
+                )
+              }
+            >
+              {categoria.nombre}
+            </button>
+          )
+        )}
       </div>
 
-      {/* Barra de herramientas / Contador */}
+      {/* CONTADOR */}
+
       <div className="toolbar">
         <div className="toolbar-left">
-          {categoriaSeleccionada === "Todas"
+          {categoriaSeleccionada ===
+          "Todas"
             ? "Todos los diseños"
             : categoriaSeleccionada}
 
           <span className="badge-count">
-            {productosFiltrados.length}
+            {
+              productosFiltrados.length
+            }
           </span>
         </div>
 
         <div className="toolbar-right">
-          {productosFiltrados.length} producto
-          {productosFiltrados.length !== 1 && "s"} registrado
-          {productosFiltrados.length !== 1 && "s"}
+          {
+            productosFiltrados.length
+          }{" "}
+          producto
+          {productosFiltrados.length !==
+            1 && "s"}{" "}
+          registrado
+          {productosFiltrados.length !==
+            1 && "s"}
         </div>
       </div>
 
-      {/* Grid o Estado Vacío */}
-      {productosFiltrados.length > 0 ? (
+      {/* PRODUCTOS */}
+
+      {productosFiltrados.length >
+      0 ? (
         <div className="product-grid">
-          {productosFiltrados.map((producto) => (
-            <ProductCard
-              key={producto.id_producto}
-              producto={producto}
-            />
-          ))}
+          {productosFiltrados.map(
+            (producto) => (
+              <ProductCard
+                key={producto.id}
+                producto={producto}
+              />
+            )
+          )}
         </div>
       ) : (
-        // CA4
         <div className="empty-state">
           <div className="empty-icon-container">
             <svg
@@ -109,7 +175,7 @@ function Catalogo() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"
               />
             </svg>
           </div>
@@ -119,7 +185,10 @@ function Catalogo() {
           </h3>
 
           <p className="empty-text">
-            No encontramos diseños en esta categoría por el momento.
+            {categoriaSeleccionada ===
+            "Todas"
+              ? "No hay playeras registradas por el momento."
+              : `No encontramos diseños en la categoría ${categoriaSeleccionada} por el momento.`}
           </p>
         </div>
       )}
