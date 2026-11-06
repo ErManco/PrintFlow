@@ -1,35 +1,53 @@
 import { Link } from "react-router-dom";
 
 function ProductCard({ producto }) {
-  // Verificamos si la imagen es una URL real o base64 (subida por admin)
+  const imagen =
+    producto.imagen || "";
+
   const esImagenReal =
-    producto.imagen.startsWith("data:image") ||
-    producto.imagen.startsWith("http") ||
-    producto.imagen.includes("."); // Por si usas rutas como "/img/playera.jpg"
+    imagen.startsWith("data:image") ||
+    imagen.startsWith("http") ||
+    imagen.includes(".");
+
+  const precio = Number(
+    producto.precio || 299
+  ).toFixed(2);
 
   return (
-    // Envolvemos todo en un Link hacia el detalle usando el ID
-    <Link to={`/producto/${producto.id}`} className="product-card-link">
+    <Link
+      to={`/producto/${producto.id}`}
+      className="product-card-link"
+    >
       <article className="product-card">
         <div className="product-image-container">
           {esImagenReal ? (
             <img
-              src={producto.imagen}
+              src={imagen}
               alt={`Diseño ${producto.titulo}`}
               className="real-shirt-img"
             />
           ) : (
-            <div className={`shirt-mockup ${producto.imagen}`}></div>
+            <div
+              className={`shirt-mockup ${imagen}`}
+            ></div>
           )}
-          <span className="product-badge">{producto.categoria}</span>
+
+          <span className="product-badge">
+            {producto.categoria}
+          </span>
         </div>
 
         <div className="product-info">
-          <h3 className="product-title">{producto.titulo}</h3>
-          <p className="product-description">{producto.descripcion}</p>
-          {/* Agregamos el precio para que sea consistente */}
+          <h3 className="product-title">
+            {producto.titulo}
+          </h3>
+
+          <p className="product-description">
+            {producto.descripcion}
+          </p>
+
           <p className="product-card-price">
-            {producto.precio ? `$${producto.precio} MXN` : "$299.00 MXN"}
+            ${precio} MXN
           </p>
         </div>
       </article>

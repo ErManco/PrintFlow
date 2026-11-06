@@ -2,63 +2,118 @@ import { createContext, useState, useContext } from "react";
 
 const AuthContext = createContext();
 
+const API_URL = "http://localhost:3000/api/auth";
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("printflow_user");
+
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  const login = (email, password) => {
-    // Credenciales de admin fijas
-    if (email === "admin@printflow.com" && password === "admin123") {
-      const adminUser = { id: 1, name: "Administrador", role: "admin", email };
-      setUser(adminUser);
-      localStorage.setItem("printflow_user", JSON.stringify(adminUser));
-      return { success: true, role: "admin" };
-    } 
-    
-    // Validar con usuarios registrados
-    const usuariosGuardados = JSON.parse(localStorage.getItem("printflow_usuarios") || "[]");
-    const usuarioEncontrado = usuariosGuardados.find(u => u.email === email && u.password === password);
+  const login = async (email, password) => {
+    try {
+      const respuesta = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    if (usuarioEncontrado) {
-      const { password: _, ...usuarioSinPass } = usuarioEncontrado; // No guardamos la contraseña en la sesión
-      setUser(usuarioSinPass);
-      localStorage.setItem("printflow_user", JSON.stringify(usuarioSinPass));
-      return { success: true, role: "client" };
+      const datos = await respuesta.json();
+
+      if (!respuesta.ok) {
+        return {
+          success: false,
+          message: datos.message || "Credenciales incorrectas",
+        };
+      }
+
+      setUser(datos.user);
+
+      localStorage.setItem(
+        "printflow_user",
+        JSON.stringify(datos.user)
+      );
+
+      localStorage.setItem(
+        "printflow_token",
+        datos.token
+      );
+
+      return {
+        success: true,
+        role: datos.user.role,
+      };
+    } catch (error) {
+      console.error("Error en login:", error);
+
+      return {
+        success: false,
+        message: "No se pudo conectar con el servidor",
+      };
     }
-
-    return { success: false, message: "Credenciales incorrectas" };
   };
 
-  const registrar = (name, email, password) => {
-    const usuariosGuardados = JSON.parse(localStorage.getItem("printflow_usuarios") || "[]");
-    
-    // Validar que el correo no exista
-    if (usuariosGuardados.some(u => u.email === email) || email === "admin@printflow.com") {
-      return { success: false, message: "Este correo ya está registrado." };
+  const registrar = async (name, email, password) => {
+    try {
+      const respuesta = await fetch(`${API_URL}/registro`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
+
+      const datos = await respuesta.json();
+
+      if (!respuesta.ok) {
+        return {
+          success: false,
+          message:
+            datos.message ||
+            "No se pudo registrar el usuario",
+        };
+      }
+
+      return {
+        success: true,
+        message: datos.message,
+      };
+    } catch (error) {
+      console.error("Error en registro:", error);
+
+      return {
+        success: false,
+        message: "No se pudo conectar con el servidor",
+      };
     }
-
-    const nuevoUsuario = {
-      id: Date.now(),
-      name,
-      email,
-      password,
-      role: "client"
-    };
-
-    // Guardar en la "BD"
-    localStorage.setItem("printflow_usuarios", JSON.stringify([...usuariosGuardados, nuevoUsuario]));
-    return { success: true };
   };
 
   const logout = () => {
     setUser(null);
+
     localStorage.removeItem("printflow_user");
+    localStorage.removeItem("printflow_token");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, registrar }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        registrar,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
