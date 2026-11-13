@@ -22,6 +22,7 @@ import Registro from "./Pages/Registro";
 import Carrito from "./Pages/Carrito";
 import Contacto from "./Pages/Contacto";
 import AdminProductos from "./Pages/AdminProductos";
+import Personalizar from "./Pages/Personalizar";
 
 function RutaUsuario({
   children,
@@ -146,6 +147,15 @@ function App() {
             <RutaAdmin>
               <AdminProductos />
             </RutaAdmin>
+          }
+        />
+        {/* Personalizar */}
+        <Route
+          path="/personalizar"
+          element={
+            <RutaUsuario>
+              <Personalizar />
+            </RutaUsuario>
           }
         />
 

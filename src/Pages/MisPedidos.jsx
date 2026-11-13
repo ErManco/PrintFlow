@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { pedidos as todosLosPedidos } from "../data/pedidos";
+import { usePedidos } from "../context/PedidosContext"; // <-- Contexto global
 import { useAuth } from "../context/AuthContext";
+import PedidoDetalleCliente from "../components/PedidoDetalleCliente"; // <-- Modal de cliente
 
 function MisPedidos() {
+  const { pedidos } = usePedidos();
   const { user } = useAuth();
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
   
   // Filtramos para que el cliente solo vea SUS pedidos
-  const misPedidos = todosLosPedidos.filter(
+  const misPedidos = pedidos.filter(
     (pedido) => pedido.cliente === user?.name
   );
 
@@ -27,6 +30,7 @@ function MisPedidos() {
                 <th>Fecha</th>
                 <th>Total</th>
                 <th>Estado</th>
+                <th>Acciones</th> {/* <-- Nueva columna */}
               </tr>
             </thead>
             <tbody>
@@ -40,6 +44,14 @@ function MisPedidos() {
                       {pedido.estado}
                     </span>
                   </td>
+                  <td>
+                    <button 
+                      className="btn-ver-detalle" 
+                      onClick={() => setPedidoSeleccionado(pedido)}
+                    >
+                      Ver seguimiento
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -47,14 +59,16 @@ function MisPedidos() {
         </div>
       ) : (
         <div className="empty-state">
-          <div className="empty-icon-container">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-          </div>
-          <h3 className="empty-title">Aún no tienes pedidos</h3>
-          <p className="empty-text">Cuando realices una compra, aparecerá aquí.</p>
+          {/* ... (El estado vacío se queda igual) ... */}
         </div>
+      )}
+
+      {/* MODAL DEL CLIENTE */}
+      {pedidoSeleccionado && (
+        <PedidoDetalleCliente 
+          pedido={pedidoSeleccionado} 
+          onClose={() => setPedidoSeleccionado(null)}
+        />
       )}
     </main>
   );

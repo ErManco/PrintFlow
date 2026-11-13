@@ -22,6 +22,10 @@ import {
   CategoriasProvider,
 } from "./context/CategoriasContext";
 
+import {
+    PedidosProvider,
+} from "./context/PedidosContext";
+
 import App from "./App.jsx";
 
 import "./index.css";
@@ -35,7 +39,9 @@ ReactDOM.createRoot(
         <CarritoProvider>
           <CategoriasProvider>
             <ProductosProvider>
-              <App />
+              <PedidosProvider>
+                <App />
+              </PedidosProvider>
             </ProductosProvider>
           </CategoriasProvider>
         </CarritoProvider>

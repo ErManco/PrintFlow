@@ -1144,3 +1144,335 @@ footer {
   /* Si el texto tiene fondo blanco y quieres quitarlo, puedes usar mix-blend-mode */
   /* mix-blend-mode: multiply; */ 
 }
+
+/* --- BOTÓN VER DETALLE --- */
+.btn-ver-detalle {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  color: #4f46e5;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ver-detalle:hover {
+  background: #e0e7ff;
+  border-color: #4f46e5;
+}
+
+/* --- MODAL DE SEGUIMIENTO --- */
+.seguimiento-modal {
+  max-width: 700px;
+}
+
+.seguimiento-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.seguimiento-header h2 {
+  font-size: 1.8rem;
+  color: #111827;
+}
+.seguimiento-header p {
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+/* --- LÍNEA DE TIEMPO ANIMADA --- */
+.timeline-container {
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+}
+
+.timeline-track {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* La línea gris de fondo */
+.timeline-track::before {
+  content: '';
+  position: absolute;
+  top: 20px; /* La mitad del tamaño del ícono */
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+/* La barra que se llena (color morado) */
+.timeline-progress {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  height: 4px;
+  background: #4f46e5;
+  border-radius: 2px;
+  z-index: 2;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); /* Animación suave */
+}
+
+.timeline-step {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+}
+
+.step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: 4px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.4s ease;
+}
+
+/* Estilos para los pasos completados */
+.timeline-step.completado .step-icon {
+  border-color: #4f46e5;
+  background: #e0e7ff;
+  transform: scale(1.1);
+}
+
+/* Estilos para el paso actual (animación de pulso) */
+.timeline-step.activo .step-icon {
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 50%;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-align: center;
+  transition: color 0.3s;
+}
+
+.timeline-step.completado .step-label {
+  color: #4f46e5;
+}
+
+/* --- SECCIÓN PARA ACTUALIZAR --- */
+.actualizar-estado-section {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.actualizar-estado-section h3 {
+  font-size: 1.1rem;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.helper-text {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.estado-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-estado {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-estado:hover:not(:disabled) {
+  border-color: #4f46e5;
+  color: #4f46e5;
+  background: #f5f3ff;
+}
+
+.btn-estado.current {
+  background: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+  cursor: default;
+}
+
+.btn-estado:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Animación de pulso */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+.cliente-status-message {
+  text-align: center;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+  color: #4b5563;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+/* --- EDITOR DE PERSONALIZACIÓN --- */
+.editor-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.editor-controls {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  height: fit-content;
+}
+
+.editor-controls h3 {
+  font-size: 1rem;
+  color: #111827;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+.editor-controls h3:first-child {
+  margin-top: 0;
+}
+
+.color-picker-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.color-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.color-circle:hover {
+  transform: scale(1.1);
+}
+.color-circle.active {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  transform: scale(1.1);
+}
+
+.text-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+/* LIENZO DE LA PLAYERA */
+.editor-canvas-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px dashed #d1d5db;
+}
+
+.canvas-playera {
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 1;
+  position: relative;
+  border-radius: 20px;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
+  cursor: crosshair;
+  transition: background-color 0.3s;
+  overflow: hidden;
+}
+
+/* Simulamos la forma de la playera con un recorte y sombras */
+.shirt-neck {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 60px;
+  background: #f9fafb; /* Color del fondo del contenedor */
+  border-radius: 50%;
+  box-shadow: 0 10px 0 -5px rgba(0,0,0,0.1) inset;
+}
+
+/* El área donde se coloca la imagen/texto */
+.design-area {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Para que el clic pase a la playera */
+  text-align: center;
+}
+
+.design-image {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.design-text {
+  font-weight: 800;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+  word-break: break-word;
+  max-width: 250px;
+}
+
+@media (max-width: 768px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+}
